@@ -9,7 +9,8 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "express": "^4.15.2",
-    "gulp": "^3.9.1"
+    "browser-sync": "^2.18.8",
+    "gulp": "^3.9.1",
+    "gulp-stylus": "^2.6.0"
   }
 }
