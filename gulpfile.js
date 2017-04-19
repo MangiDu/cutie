@@ -1,6 +1,7 @@
 var gulp = require('gulp')
 var plumber = require('gulp-plumber')
 var stylus = require('gulp-stylus')
+var autoprefixer = require('gulp-autoprefixer')
 var rename = require('gulp-rename')
 var browserSync = require('browser-sync')
 var reload = browserSync.reload
@@ -10,6 +11,12 @@ gulp.task('stylus', function () {
     .pipe(plumber())
     .pipe(stylus())
     .pipe(rename('pt.css'))
+    .pipe(autoprefixer({
+      browsers: [
+        'last 7 versions',
+        'not ie <= 8'
+      ]
+    }))
     .pipe(gulp.dest('./src/css'))
     .pipe(reload({
       stream: true
