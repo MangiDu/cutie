@@ -4,6 +4,7 @@ var plumber = require('gulp-plumber')
 var stylus = require('gulp-stylus')
 var autoprefixer = require('gulp-autoprefixer')
 var rename = require('gulp-rename')
+var spriter = require('gulp-css-spriter')
 var pug = require('gulp-pug')
 var inject = require('gulp-inject')
 var browserSync = require('browser-sync')
@@ -30,6 +31,15 @@ gulp.task('stylus', function () {
     .pipe(reload({
       stream: true
     }))
+})
+
+gulp.task('sprite', function () {
+  return gulp.src('dist/css/*.css')
+    .pipe(spriter({
+      'spriteSheet': 'dist/img/spritesheet.png',
+      'pathToSpriteSheetFromCSS': '../img/spritesheet.png'
+    }))
+    .pipe(gulp.dest('dist/css'))
 })
 
 gulp.task('pug', function () {
