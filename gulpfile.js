@@ -4,7 +4,7 @@ var del = require('del')
 var plumber = require('gulp-plumber')
 var stylus = require('gulp-stylus')
 var autoprefixer = require('gulp-autoprefixer')
-var rename = require('gulp-rename')
+// var rename = require('gulp-rename')
 var spriter = require('gulp-css-spriter')
 var pug = require('gulp-pug')
 var inject = require('gulp-inject')
@@ -23,7 +23,6 @@ gulp.task('stylus:common', function () {
   return gulp.src('src/stylus/common/index.styl')
     .pipe(plumber())
     .pipe(stylus())
-    .pipe(rename('common.css'))
     .pipe(cleanCSS({
       format: 'beautify',
       level: 2
@@ -34,7 +33,7 @@ gulp.task('stylus:common', function () {
         'not ie <= 8'
       ]
     }))
-    .pipe(gulp.dest('dist/css'))
+    .pipe(gulp.dest('dist/css/common'))
     .pipe(reload({
       stream: true
     }))
@@ -54,7 +53,7 @@ gulp.task('stylus:app', function () {
       'not ie <= 8'
     ]
   }))
-  .pipe(gulp.dest('dist/css'))
+  .pipe(gulp.dest('dist/css/app'))
   .pipe(reload({
     stream: true
   }))
@@ -62,14 +61,14 @@ gulp.task('stylus:app', function () {
 
 gulp.task('stylus', ['stylus:common', 'stylus:app'])
 
-gulp.task('sprite', function () {
-  return gulp.src('dist/css/*.css')
-    .pipe(spriter({
-      'spriteSheet': 'dist/img/spritesheet.png',
-      'pathToSpriteSheetFromCSS': '../img/spritesheet.png'
-    }))
-    .pipe(gulp.dest('dist/css'))
-})
+// gulp.task('sprite', function () {
+//   return gulp.src('dist/css/**/*.css')
+//     .pipe(spriter({
+//       'spriteSheet': 'dist/img/spritesheet.png',
+//       'pathToSpriteSheetFromCSS': '../img/spritesheet.png'
+//     }))
+//     .pipe(gulp.dest('dist/css'))
+// })
 
 gulp.task('pug', function () {
   return gulp.src('src/views/*.pug')
@@ -98,7 +97,7 @@ gulp.task('inject', ['stylus', 'pug'], function () {
   var stream = gulp.src('dist/*.html')
     .pipe(inject(gulp.src([
       'dist/vendor/**/*',
-      'dist/css/common.css'
+      'dist/css/common/index.css'
     ], {
       read: false
     }), {
@@ -107,7 +106,7 @@ gulp.task('inject', ['stylus', 'pug'], function () {
     // https://github.com/klei/gulp-inject/issues/80
     .pipe(through.obj(function (file, enc, cb) {
       var filename = file.relative.split('.')[0]
-      var filepath = 'dist/css/' + filename + '.css'
+      var filepath = 'dist/css/app/' + filename + '.css'
       console.log('creating pipe for ' + filename)
       stream = stream.pipe(inject(gulp.src(filepath, {
         read: false
