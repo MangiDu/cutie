@@ -1,3 +1,4 @@
+var path = require('path')
 var gulp = require('gulp')
 var del = require('del')
 var plumber = require('gulp-plumber')
@@ -94,21 +95,30 @@ gulp.task('copy:assets', function () {
 gulp.task('copy', ['copy:vendor', 'copy:assets'])
 
 gulp.task('inject', ['stylus', 'pug'], function () {
-  var filename = ''
-  return gulp.src('dist/*.html')
-    .pipe(through.obj(function(file, enc, cb){
-        filename = file.relative.split('.')[0]
-        this.push(file);
-        cb();
-    }))
+  var stream = gulp.src('dist/*.html')
     .pipe(inject(gulp.src([
       'dist/vendor/**/*',
-      'dist/css/*.css',
-      'dist/css/' + filename + '.css'
+      'dist/css/common.css'
     ], {
       read: false
-    }), {relative: true}))
-    .pipe(gulp.dest('dist'))
+    }), {
+      relative: true
+    }))
+    // https://github.com/klei/gulp-inject/issues/80
+    .pipe(through.obj(function (file, enc, cb) {
+      var filename = file.relative.split('.')[0]
+      var filepath = 'dist/css/' + filename + '.css'
+      console.log('creating pipe for ' + filename)
+      stream = stream.pipe(inject(gulp.src(filepath, {
+        read: false
+      }), {
+        name: 'single',
+        relative: true
+      }))
+      this.push(file)
+      cb();
+    }))
+  return stream.pipe(gulp.dest('dist'))
 })
 
 gulp.task('compile', ['copy', 'stylus', 'pug', 'inject'])
