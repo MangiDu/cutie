@@ -9,6 +9,7 @@ var pug = require('gulp-pug')
 var inject = require('gulp-inject')
 var through = require('through2')
 var browserSync = require('browser-sync')
+var cleanCSS = require('gulp-clean-css')
 var reload = browserSync.reload
 
 gulp.task('clean', function (cb) {
@@ -22,6 +23,10 @@ gulp.task('stylus:common', function () {
     .pipe(plumber())
     .pipe(stylus())
     .pipe(rename('common.css'))
+    .pipe(cleanCSS({
+      format: 'beautify',
+      level: 2
+    }))
     .pipe(autoprefixer({
       browsers: [
         'last 7 versions',
@@ -38,6 +43,10 @@ gulp.task('stylus:app', function () {
   return gulp.src('src/stylus/app/*.styl')
   .pipe(plumber())
   .pipe(stylus())
+  .pipe(cleanCSS({
+    format: 'beautify',
+    level: 2
+  }))
   .pipe(autoprefixer({
     browsers: [
       'last 7 versions',
