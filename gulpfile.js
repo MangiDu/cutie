@@ -7,6 +7,7 @@ var rename = require('gulp-rename')
 var spriter = require('gulp-css-spriter')
 var pug = require('gulp-pug')
 var inject = require('gulp-inject')
+var through = require('through2')
 var browserSync = require('browser-sync')
 var reload = browserSync.reload
 
@@ -16,11 +17,11 @@ gulp.task('clean', function (cb) {
   ], cb)
 })
 
-gulp.task('stylus', function () {
-  return gulp.src('src/stylus/index.styl')
+gulp.task('stylus:common', function () {
+  return gulp.src('src/stylus/common/index.styl')
     .pipe(plumber())
     .pipe(stylus())
-    .pipe(rename('index.css'))
+    .pipe(rename('common.css'))
     .pipe(autoprefixer({
       browsers: [
         'last 7 versions',
@@ -32,6 +33,24 @@ gulp.task('stylus', function () {
       stream: true
     }))
 })
+
+gulp.task('stylus:app', function () {
+  return gulp.src('src/stylus/app/*.styl')
+  .pipe(plumber())
+  .pipe(stylus())
+  .pipe(autoprefixer({
+    browsers: [
+      'last 7 versions',
+      'not ie <= 8'
+    ]
+  }))
+  .pipe(gulp.dest('dist/css'))
+  .pipe(reload({
+    stream: true
+  }))
+})
+
+gulp.task('stylus', ['stylus:common', 'stylus:app'])
 
 gulp.task('sprite', function () {
   return gulp.src('dist/css/*.css')
@@ -66,10 +85,17 @@ gulp.task('copy:assets', function () {
 gulp.task('copy', ['copy:vendor', 'copy:assets'])
 
 gulp.task('inject', ['stylus', 'pug'], function () {
+  var filename = ''
   return gulp.src('dist/*.html')
+    .pipe(through.obj(function(file, enc, cb){
+        filename = file.relative.split('.')[0]
+        this.push(file);
+        cb();
+    }))
     .pipe(inject(gulp.src([
       'dist/vendor/**/*',
-      'dist/css/*.css'
+      'dist/css/*.css',
+      'dist/css/' + filename + '.css'
     ], {
       read: false
     }), {relative: true}))
