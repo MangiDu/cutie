@@ -1,16 +1,15 @@
 {
   "name": "cutie",
   "version": "1.0.0",
-  "description": "切图小模板",
-  "main": "index.js",
+  "description": "cut page",
   "scripts": {
     "start": "gulp serve",
     "clean": "gulp clean",
     "compile": "gulp compile",
     "sprite": "gulp sprite"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Mangi <duxiaoxue93@gmail.com>",
+  "license": "MIT",
   "devDependencies": {
     "browser-sync": "^2.18.8",
     "del": "^2.2.2",
