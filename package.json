@@ -1,10 +1,13 @@
 {
-  "name": "切图小模板",
+  "name": "cutie",
   "version": "1.0.0",
   "description": "切图小模板",
   "main": "index.js",
   "scripts": {
-    "start": "gulp serve"
+    "start": "gulp serve",
+    "clean": "gulp clean",
+    "compile": "gulp compile",
+    "sprite": "gulp sprite"
   },
   "author": "",
   "license": "ISC",

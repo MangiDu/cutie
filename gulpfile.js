@@ -40,34 +40,36 @@ var compileStylus = lazypipe()
   })
 
 gulp.task('stylus:common', function () {
-  return gulp.src('src/stylus/common/index.styl')
+  return gulp.src('src/style/index.styl')
     .pipe(compileStylus())
-    .pipe(gulp.dest('dist/css/common'))
+    .pipe(gulp.dest('dist/css'))
+    .pipe(browserSync.stream())
 })
 
 gulp.task('stylus:app', function () {
-  return gulp.src('src/stylus/app/*.styl')
+  return gulp.src('src/style/app/*.styl')
     .pipe(cached('stylus:app'))
     .pipe(compileStylus())
     .pipe(remember('stylus:app'))
     .pipe(gulp.dest('dist/css/app'))
+    .pipe(browserSync.stream())
 })
 
 gulp.task('stylus', ['stylus:common', 'stylus:app'])
 
 // compile pug
+// XXX: 不知道为什么 cached 对改变的include的pug会不识别
 gulp.task('pug', function () {
   return gulp.src('src/views/*.pug')
-    .pipe(cached('pug'))
+    // .pipe(cached('pug'))
     .pipe(plumber())
     .pipe(pug({
       doctype: 'html',
       baseDir: 'src/views',
       pretty: true
     }))
-    .pipe(remember('pug'))
+    // .pipe(remember('pug'))
     .pipe(gulp.dest('dist'))
-    .pipe(browserSync.stream())
 })
 
 // copy static files
@@ -102,7 +104,7 @@ gulp.task('inject', ['stylus', 'pug', 'copy:vendor'], function () {
       var stm = gulp.src(filePath)
         .pipe(inject(gulp.src([
           'dist/vendor/**/*',
-          'dist/css/common/index.css'
+          'dist/css/index.css'
         ], {
           read: false
         }), {
@@ -121,8 +123,12 @@ gulp.task('inject', ['stylus', 'pug', 'copy:vendor'], function () {
   return merge(stms).pipe(gulp.dest('dist'))
 })
 
-gulp.task('compile', ['copy', 'stylus', 'pug', 'inject'])
+gulp.task('live-inject', ['inject'], function (done) {
+  browserSync.reload()
+  done()
+})
 
+gulp.task('compile', ['copy', 'stylus', 'pug', 'inject'])
 
 var reload = browserSync.reload
 gulp.task('serve', ['compile'], function() {
@@ -131,15 +137,14 @@ gulp.task('serve', ['compile'], function() {
     port: 8003
   })
 
-  gulp.watch('dist/*.html').on('change', reload)
   gulp.watch('dist/vendor/**/*').on('change', reload)
   gulp.watch('dist/assets/**/*').on('change', reload)
 
-  gulp.watch('src/stylus/**/*.styl', ['inject'])
-  gulp.watch('src/views/**/*.pug', ['inject'])
+  gulp.watch('src/style/**/*.styl', ['stylus'])
+  gulp.watch('src/views/**/*.pug', ['pug', 'live-inject'])
   gulp.watch([
-    'src/vendor/**/*.*',
-    'src/assets/**/*.*'
+    'src/vendor/**/*',
+    'src/assets/**/*'
   ], ['copy'])
 })
 
